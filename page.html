@@ -1,0 +1,504 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Chemical Sector Monitor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a headline band under the title, a dark row of category menus below it, then one full-width reading pane. */
+:root {
+  --bg: #f3f6f6; --panel: #ffffff; --ink: #14272c; --muted: #51676d; --line: #d3dee0;
+  --accent: #0b5f6e; --accent-ink: #ffffff; --soft: #e3eef0;
+  --div: #dcebf3; --div-ink: #123f58;
+  --spec: #dcefe6; --spec-ink: #14503a;
+  --form: #f6e8d2; --form-ink: #66420c;
+  --warn: #8a4b08;
+  --dist: #e8e3f3; --dist-ink: #3f2f6b;
+  --menu: #2f6f80; --menu-ink: #ffffff; --menu-hover: #f2b33d; --menu-hover-ink: #0e3440;
+  --side-on: #ffffff; --side-on-ink: #0e3440;
+  --band: #0e3440; --band-ink: #ffffff; --band-muted: #b4ccd2;
+  --display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1a1d; --panel: #16252a; --ink: #e4eef0; --muted: #9db2b8; --line: #2b4148;
+  --accent: #58c0d2; --accent-ink: #08252c; --soft: #1e3a41;
+  --div: #173b4e; --div-ink: #bfe2f4;
+  --spec: #17402f; --spec-ink: #bdecd6;
+  --form: #4a3413; --form-ink: #f7dcae;
+  --warn: #f0b566; --dist: #2f2750; --dist-ink: #d8cff5; --band: #0a2127; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0f1a1d; --panel: #16252a; --ink: #e4eef0; --muted: #9db2b8; --line: #2b4148;
+  --accent: #58c0d2; --accent-ink: #08252c; --soft: #1e3a41;
+  --div: #173b4e; --div-ink: #bfe2f4;
+  --spec: #17402f; --spec-ink: #bdecd6;
+  --form: #4a3413; --form-ink: #f7dcae;
+  --warn: #f0b566; --dist: #2f2750; --dist-ink: #d8cff5; --band: #0a2127; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--body); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { background: var(--band); color: var(--band-ink); }
+.topin { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px; padding-block: 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: 1.6rem; font-weight: 600; line-height: 1.1; letter-spacing: .01em; }
+.asof { font: 400 .8rem var(--mono); color: var(--band-muted); }
+.topr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.logo { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 0; font: 700 .85rem var(--display); overflow: hidden; }
+.logo img { width: 100%; height: 100%; object-fit: contain; }
+.logo.lg { width: 52px; height: 52px; font-size: 1.35rem; }
+.logo.div { background: var(--div); color: var(--div-ink); }
+.logo.spec { background: var(--spec); color: var(--spec-ink); }
+.logo.form { background: var(--form); color: var(--form-ink); }
+.logo.dist { background: var(--dist); color: var(--dist-ink); }
+.side { position: sticky; top: calc(41px + env(safe-area-inset-top, 0px)); z-index: 14; background: var(--band); color: var(--band-ink); }
+.sidein { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.cat { position: relative; }
+.cbtn { display: flex; align-items: center; gap: 10px; padding: 9px 18px; background: var(--menu); border: 0; color: var(--menu-ink); font: 700 1.15rem var(--display); letter-spacing: .01em; white-space: nowrap; cursor: pointer; }
+.cbtn:hover, .cbtn[aria-expanded="true"] { background: var(--menu-hover); color: var(--menu-hover-ink); }
+.cat.on .cbtn { box-shadow: 0 0 0 2px #ffffff; }
+.cbtn span { font: 500 .78rem var(--mono); color: inherit; }
+.cbtn::after { content: ""; width: 8px; height: 8px; margin-top: -4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); }
+.cbtn[aria-expanded="true"]::after { margin-top: 4px; transform: rotate(-135deg); }
+#rm-pw { width: 170px; padding: 7px 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: 400 .9rem var(--body); }
+.cbody { position: absolute; top: calc(100% + 8px); left: 0; border-top: 4px solid var(--menu-hover); z-index: 30; display: flex; flex-direction: column; gap: 2px; width: 300px; max-height: calc(100vh - 120px); overflow-y: auto; padding: 8px; background: var(--band); box-shadow: 0 10px 22px rgba(4, 22, 28, .35); }
+.cat:nth-last-child(-n+2) .cbody { left: auto; right: 0; }
+.cat[data-cat="manufacturers"] .cbody { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 600px; }
+.addbtn, .addform { grid-column: 1 / -1; }
+.mi { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; padding: 7px 8px; background: none; border: 0; color: var(--band-ink); font: 600 1rem/1.25 var(--body); text-align: left; cursor: pointer; }
+.mi:hover { background: rgba(255, 255, 255, .13); }
+.mi[aria-current="page"] { background: var(--side-on); color: var(--side-on-ink); }
+.mi .mtxt { min-width: 0; display: flex; flex-direction: column; }
+.mi small { font: 400 .74rem/1.3 var(--mono); color: var(--band-muted); }
+.mi[aria-current="page"] small { color: var(--side-on-ink); }
+.side button:focus-visible { outline: 2px solid var(--band-ink); outline-offset: -2px; }
+.addbtn { width: 100%; margin-top: 6px; padding: 8px; background: none; border: 1px dashed var(--band-muted); color: var(--band-ink); font: 600 .95rem var(--body); cursor: pointer; }
+.addbtn:hover { background: rgba(255, 255, 255, .13); }
+.addform { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 12px; background: var(--panel); color: var(--ink); }
+.addform label { display: flex; flex-direction: column; gap: 3px; font-size: .86rem; font-weight: 600; }
+.addform input { width: 100%; padding: 7px 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 400 .95rem var(--body); }
+.addform p { margin: 0; font-size: .8rem; color: var(--muted); }
+.addform .adderr { color: var(--warn); font-weight: 600; }
+.addacts { display: flex; gap: 8px; }
+.ticker { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 15; background: var(--soft); border-bottom: 1px solid var(--line); }
+.tickin { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding-block: 9px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.tlabel { flex: none; font: 500 .68rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tview { flex: 1; min-width: 0; overflow: hidden; }
+.ttrack { display: flex; width: max-content; animation: tick var(--tick-time, 60s) linear infinite; }
+.ttrack:hover, .ttrack:focus-within { animation-play-state: paused; }
+.titem { flex: none; display: inline-flex; align-items: baseline; gap: 8px; padding-right: 40px; font-size: .92rem; font-weight: 600; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.titem:hover { color: var(--accent); text-decoration: underline; }
+.titem small { font: 400 .72rem var(--mono); color: var(--muted); }
+@keyframes tick { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .ttrack { animation: none; }
+  .tview { overflow-x: auto; }
+  .titem[aria-hidden="true"] { display: none; }
+}
+main { min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.head h2 { font-size: 1.75rem; font-weight: 600; line-height: 1.15; }
+.hd { display: flex; align-items: center; gap: 14px; }
+.head p { margin: 4px 0 0; color: var(--muted); max-width: 65ch; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.btn { display: inline-block; padding: 7px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); color: var(--ink); font: 600 .9rem var(--body); text-decoration: none; cursor: pointer; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { color: var(--accent-ink); opacity: .9; }
+.btn:disabled { opacity: .6; cursor: wait; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.stat { background: var(--panel); padding: 12px 14px; }
+.stat b { display: block; font: 600 1.6rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .85rem; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 4px 11px; border: 1px solid var(--line); border-radius: 99px; background: none; color: var(--ink); font: 600 .85rem var(--body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.feed { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--line); }
+.feed li { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.feed li:last-child { border-bottom: 0; }
+.feed time, .feed .d { font: 400 .78rem/1.6 var(--mono); color: var(--muted); }
+.feed a.t { font-weight: 600; text-decoration: none; color: var(--ink); }
+.feed a.t:hover { color: var(--accent); text-decoration: underline; }
+.feed p { margin: 2px 0 0; color: var(--muted); font-size: .95rem; max-width: 70ch; overflow-wrap: anywhere; }
+.feed .src { font: 400 .74rem var(--mono); color: var(--muted); margin-left: 6px; white-space: nowrap; }
+.tag { display: inline-block; font: 500 .66rem var(--mono); text-transform: uppercase; letter-spacing: .05em; padding: 1px 6px; border-radius: 3px; background: var(--soft); color: var(--ink); margin-right: 6px; }
+.trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.trend { background: var(--panel); border: 1px solid var(--line); padding: 16px; }
+.trend h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.2; margin-bottom: 6px; }
+.trend p { margin: 0 0 8px; }
+.trend .ev { font-size: .85rem; color: var(--muted); margin: 0; }
+.dir { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.dir a { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); font-weight: 600; }
+.dir a:hover { color: var(--accent); }
+.dir a span { font-weight: 400; font-size: .85rem; color: var(--muted); text-align: right; }
+.sec h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
+.live { background: var(--soft); padding: 16px; }
+.live h3 { font-size: 1.15rem; font-weight: 600; }
+.live > p { margin: 2px 0 10px; font-size: .9rem; color: var(--muted); }
+.live form { display: flex; flex-wrap: wrap; gap: 8px; }
+.live input, .live select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); color: var(--ink); font: 400 .95rem var(--body); }
+.live input { flex: 1 1 220px; min-width: 0; }
+.live .msg { margin: 10px 0 0; font-size: .92rem; color: var(--warn); }
+.live .feed { margin-top: 10px; }
+.note { font-size: .9rem; color: var(--muted); max-width: 70ch; }
+@media (max-width: 860px) {
+  .side { position: relative; top: auto; }
+  .cat { position: static; }
+  .cbtn { padding: 8px 12px; font-size: 1.05rem; }
+  .cbody { top: 100%; }
+  .cbody, .cat:nth-last-child(-n+2) .cbody, .cat[data-cat="manufacturers"] .cbody { left: 16px; right: 16px; width: auto; grid-template-columns: minmax(0, 1fr); }
+  .trends, .dir { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  h1 { font-size: 1.6rem; }
+  .feed li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .tlabel { display: none; }
+}
+</style>
+
+<header class="top"><div class="topin">
+  <h1>Chemical Sector Monitor</h1>
+  <div class="topr"><span class="asof" id="asof">News from 5 Nov 2026</span><button class="btn" id="refresh" type="button">Refresh</button></div>
+</div></header>
+<div class="ticker" aria-label="Major updates"><div class="tickin"><span class="tlabel">Major updates</span><div class="tview"><div class="ttrack" id="ticker"></div></div></div></div>
+<nav class="side" aria-label="Main menu"><div class="sidein" id="menus"></div></nav>
+<div class="wrap">
+  <main id="view"></main>
+</div>
+
+<script>
+/* Logo files go here as data URIs, keyed by company id. Until then each company shows its initials. */
+const LOGOS = {};
+const logo = (c, big) => `<span class="logo ${c.fam}${big ? " lg" : ""}">${LOGOS[c.id] ? `<img src="${LOGOS[c.id]}" alt="">` : esc(c.sym)}</span>`;
+
+const COMPANIES = [
+  { id: "dow", sym: "Dw", name: "Dow", tick: "NYSE: DOW", fam: "div", q: "Dow Inc chemical",
+    lede: "Beat Q3 estimates on pricing and cost actions. New CEO Karen S. Carter leads the Transform to Outperform programme.",
+    stats: [["$11.3B", "Q3 revenue"], ["$0.71", "Operating EPS, consensus about $0.61 to $0.64"], ["$1.1B", "Q3 free cash flow"]],
+    links: [["Q3 results release", "https://www.prnewswire.com/news-releases/dow-reports-third-quarter-2026-results-302916752.html"], ["Transform to Outperform", "https://corporate.dow.com/en-us/news/press-releases/dow-launches-transform-to-outperform-to-raise-the-competitive-in.html"]] },
+  { id: "henkel", sym: "He", name: "Henkel", tick: "XETRA: HEN3", fam: "form", q: "Henkel adhesive",
+    lede: "Strong Q3 organic growth, raised sales outlook, and the Stahl coatings deal now closed. Full Q3 statement due 10 November.",
+    stats: [["€5,713M", "Q3 group sales, preliminary"], ["+6.5%", "Q3 organic growth"], ["3–4%", "FY26 organic outlook, was 1.5–3.5%"]],
+    links: [["Press and media", "https://www.henkel.com/press-and-media"], ["Q3 statement, 10 Nov", "https://www.henkel.com/press-and-media/press-releases-and-kits/2026-11-10-publication-q3-2026-statement-2272808"]] },
+  { id: "wacker", sym: "Wa", name: "Wacker", tick: "XETRA: WCH", fam: "spec", q: "Wacker Chemie",
+    lede: "Q3 EBITDA nearly doubled and the result returned to profit. Sales guidance is unchanged; EBITDA is expected in the upper half of the range.",
+    stats: [["€1,466M", "Q3 sales, up about 9%"], ["€217M", "Q3 EBITDA, 14.8% margin"], ["€87.3M", "Q3 net result, was −€82.1M"]],
+    links: [["Press archive 2026", "https://www.wacker.com/cms/en-bd/press-and-media/press/press-releases/archive-2026/archiv-press-releases-2026.html"], ["Q3 release (German)", "https://www.pressetext.com/news/20261029005"]] },
+  { id: "momentive", sym: "Mo", name: "Momentive", tick: "PRIVATE", fam: "spec", q: "Momentive Performance Materials silicones",
+    lede: "Private company, so no quarterly figures. Recent news covers India silane production and a new commercial leadership team.",
+    stats: [],
+    links: [["News and press releases", "https://www.momentive.com/en-us/news-press-releases"]] },
+  { id: "basf", sym: "Ba", name: "BASF", tick: "XETRA: BAS", fam: "div", q: "BASF chemical",
+    lede: "Reported considerable EBITDA growth for Q3 while pursuing a takeover of Evonik.",
+    stats: [["$12.5B", "Sweetened Evonik bid, per FT via Reuters"]],
+    links: [["News releases", "https://www.basf.com/global/en/media/news-releases"], ["Investor releases", "https://www.basf.com/global/en/investors/calendar-and-publications/investor-releases"]] },
+  { id: "evonik", sym: "Ev", name: "Evonik", tick: "XETRA: EVK", fam: "spec", q: "Evonik",
+    lede: "More optimistic after a strong Q3, and resisting BASF while reportedly looking at Ashland.",
+    stats: [["$3.3B", "Reported Ashland deal value"]],
+    links: [["Media", "https://www.evonik.com/en/media.html"], ["Q3 2026 release", "https://www.evonik.com/en/news/press-releases/2026/11/Q3-2026.html"]] },
+  { id: "shinetsu", sym: "Sh", name: "Shin-Etsu", tick: "TSE: 4063", fam: "spec", q: "Shin-Etsu Chemical",
+    lede: "Strong first-half growth on AI-driven demand for semiconductor materials. Silicon wafer price rises have begun for some customers.",
+    stats: [["¥385.9B", "H1 operating profit, up 15.6%"], ["¥286.9B", "H1 net profit, up 11%"]],
+    links: [["Investors", "https://www.shinetsu.co.jp/en/ir/"], ["Financial data", "https://www.shinetsu.co.jp/en/ir/ir-data/ir-results/"]] },
+  { id: "otto", sym: "Ot", name: "OTTO-CHEMIE", tick: "FAMILY", fam: "form", q: "OTTO-CHEMIE sealants",
+    lede: "Family-owned sealant and adhesive maker from Fridolfing, Bavaria, founded in 1881. Its press releases focus on construction, windows and glazing.",
+    stats: [["€144.6M", "2025 revenue"], ["515", "Employees"], ["+18%", "Expert talks at Fensterbau Frontale 2026"]],
+    links: [["Company", "https://www.otto-chemie.de/wir-bei-otto"], ["Construction products", "https://www.otto-chemie.com/en/construction"]] },
+  { id: "huntsman", sym: "Hu", name: "Huntsman", tick: "NYSE: HUN", fam: "div", q: "Huntsman Corporation chemical",
+    lede: "Q3 revenue rose 18% with a narrower net loss. Its merger of equals with Olin is now expected to close in the first quarter of 2027.",
+    stats: [["$1,717M", "Q3 revenue, was $1,460M"], ["$132M", "Q3 adjusted EBITDA, was $94M"], ["−$18M", "Q3 net result, was −$25M"]],
+    links: [["News releases", "https://www.huntsman.com/investors/newsroom/news-releases"], ["Q3 2026 release", "https://www.huntsman.com/investors/newsroom/news-releases/detail/635/huntsman-announces-third-quarter-2026-earnings"]] },
+  { id: "molykote", sym: "Mk", name: "Molykote", tick: "DUPONT", fam: "spec", q: "Molykote lubricants DuPont",
+    lede: "DuPont's specialty lubricants brand, with no separate financial results. A new plant in China is expected to be operational by early 2027.",
+    stats: [],
+    links: [["News and events", "https://www.dupont.com/molykote/news-and-events.html"], ["About Molykote", "https://www.dupont.com/molykote/about-us/history.html"]] },
+  { id: "biesterfeld", sym: "Bi", name: "Biesterfeld", tick: "PRIVATE", fam: "dist", dist: 1, q: "Biesterfeld distribution",
+    lede: "Hamburg-based distributor of polymers, rubber, specialty chemicals and ingredients. Its Eastman agreement now covers eight Southern African countries.",
+    stats: [],
+    links: [["Newsroom", "https://www.biesterfeld.com/en/us/news-events/"], ["Press releases", "https://www.biesterfeld.com/en/us/press-releases/"]] },
+  { id: "bodomoller", sym: "Bm", name: "Bodo Möller", tick: "PRIVATE", fam: "dist", dist: 1, q: "Bodo Möller Chemie",
+    lede: "Specialty adhesives and advanced materials distributor, growing in aerospace with an Airbus supply contract and a new warehouse in India.",
+    stats: [],
+    links: [["News", "https://bm-chemie.com/category/news/"]] },
+  { id: "ellsworth", sym: "El", name: "Ellsworth", tick: "PRIVATE", fam: "dist", dist: 1, q: "Ellsworth Adhesives",
+    lede: "Adhesives, specialty chemicals and dispensing distributor. The most recent company release found in this check dates from April 2026.",
+    stats: [],
+    links: [["Website", "https://www.ellsworth.com/"], ["Vantablack release", "https://www.ellsworth.com/resources/news/2026/vantablack-ultra-black-coatings-now-available-globally-through-ellsworth-adhesives/"]] },
+  { id: "krayden", sym: "Kr", name: "Krayden", tick: "DISTRIB.", fam: "dist", dist: 1, q: "Krayden adhesives sealants",
+    lede: "Adhesives and sealants distributor for electronics, aerospace and lighting manufacturers. Brands include Dow Corning, Loctite, Lord and HumiSeal.",
+    stats: [],
+    links: [["Website", "https://www.krayden.com/"], ["Blog", "https://blog.krayden.com/"]] }
+];
+
+/* co: company id, or "" for sector news. approx: date inferred from a "days ago" search label. */
+const NEWS = [
+  { d: "2026-11-02", kind: "Results", co: "huntsman", t: "Huntsman reports Q3 revenue up 18% and a narrower net loss", s: "Revenues $1,717M and adjusted EBITDA $132M. Free cash flow fell to $82M from $157M.", src: "Huntsman", u: "https://www.huntsman.com/investors/newsroom/news-releases/detail/635/huntsman-announces-third-quarter-2026-earnings" },
+  { d: "2026-08-25", kind: "Deal", co: "huntsman", t: "Huntsman shareholders approve merger of equals with Olin", s: "US regulators cleared the deal in September and other approvals are pending. The combined company would trade as OHN.", src: "Huntsman", u: "https://www.huntsman.com/investors/newsroom/news-releases/detail/635/huntsman-announces-third-quarter-2026-earnings" },
+  { d: "2026-08-31", kind: "Company", co: "molykote", t: "DuPont shows Molykote lubricants at CSEAC 2026", s: "PFPE-based lubricants shown with Vespel materials for semiconductor manufacturing.", src: "DuPont", u: "https://www.dupont.com/news/dupont-highlights-vespel-high-performance-materials-at-CSEAC-2026-to-enable-next-generation-semiconductor-manufacturing.html" },
+  { d: "2025-11-18", kind: "Company", co: "molykote", t: "DuPont breaks ground on Molykote plant in China", s: "Located in Zhangjiagang, Jiangsu Province, and expected to be operational by early 2027.", src: "DuPont", u: "https://www.dupont.com/news/dupont-breaks-ground-on-molykote-lubricants-manufacturing-plant-in-china.html" },
+  { d: "2026-04-15", approx: 1, kind: "Company", co: "otto", t: "OTTO-CHEMIE reports a positive Fensterbau Frontale 2026", s: "Expert discussions rose about 18%. It sees growing demand for tested system solutions and easier processing.", src: "OTTO-CHEMIE", u: "https://www.otto-chemie.de/cdn/uploads/otto-auf-der-frontale-2026-nachberichterstattung.pdf" },
+  { d: "2025-02-15", approx: 1, kind: "Company", co: "otto", t: "OTTO-CHEMIE starts a second filling line in Fridolfing", s: "Adds capacity for sanitary silicones and an automated inline colouring process.", src: "OTTO-CHEMIE", u: "https://www.otto-chemie.de/cdn/uploads/zweite-abfuelllinie-bau-1.pdf" },
+  { d: "2026-10-27", kind: "Results", co: "shinetsu", t: "Shin-Etsu reports strong half-year earnings on AI demand", s: "Net profit rose 11% to ¥286.94B and operating profit 15.6% to ¥385.92B for the six months to 30 September.", src: "Investing.com", u: "https://www.investing.com/news/stock-market-news/why-is-shinetsu-chemical-stock-rallying-today-93CH-4977453" },
+  { d: "2026-10-27", kind: "Company", co: "shinetsu", t: "Shin-Etsu begins raising silicon wafer prices", s: "Increases have started for some customers. Long-term contracts may not follow until late 2027.", src: "XenoSpectrum", u: "https://xenospectrum.com/en/shinetsu-wafer-price-outside-contract/" },
+  { d: "2026-10-05", kind: "Distribution", co: "biesterfeld", t: "Biesterfeld expands Eastman distribution to Southern Africa", s: "Coatings and inks portfolio, sold through its local company Aerontec in eight countries.", src: "European Coatings", u: "https://www.european-coatings.com/news/markets-companies/biesterfeld-expands-eastman-distribution-to-southern-africa/" },
+  { d: "2026-05-06", kind: "Distribution", co: "biesterfeld", t: "Biesterfeld and Traceless Materials form strategic partnership", s: "Aims to bring plastic-free injection moulding materials to market at scale.", src: "CHEManager", u: "https://chemanager-online.com/en/news/biesterfeld-and-traceless-materials-form-strategic-partnership" },
+  { d: "2026-09-22", kind: "Distribution", co: "bodomoller", t: "Bodo Möller Chemie names Abdallah Dabaghi Managing Director", s: "Covers Egypt, Nigeria and the Middle East.", src: "Bodo Möller Chemie", u: "https://bm-chemie.com/news/appointment-of-maniging-director-egypt-nigeria-and-the-middle-east/" },
+  { d: "2026-07-07", kind: "Distribution", co: "bodomoller", t: "Bodo Möller Chemie opens aerospace warehouse in India", s: "AS 9120-certified site for aerospace and specialty chemicals.", src: "Bodo Möller Chemie", u: "https://bm-chemie.com/news/inaugauration-warehouse-india-aerospace/" },
+  { d: "2026-03-02", kind: "Distribution", co: "bodomoller", t: "Bodo Möller Chemie signs worldwide supply contract with Airbus", s: "Strengthens its aerospace business.", src: "Bodo Möller Chemie", u: "https://bm-chemie.com/news/supply-contract-airbus/" },
+  { d: "2026-02-16", kind: "Distribution", co: "bodomoller", t: "Bodo Möller Chemie and Henkel expand automotive sales cooperation", s: "Builds on their partnership in Central and Eastern Europe.", src: "European Coatings", u: "https://www.european-coatings.com/news/bodo-moller-chemie-and-henkel-expand-sales-cooperation-in-the-automotive-sector/" },
+  { d: "2026-04-21", kind: "Distribution", co: "ellsworth", t: "Ellsworth Adhesives to highlight Vantablack 310 at Space Tech Expo", s: "Aerospace materials from partners including Dow, Dymax and Henkel, shown in Anaheim on 3–4 June.", src: "Ellsworth", u: "https://www.ellsworth.com/resources/news/2026/ellsworth-adhesives-to-highlight-vantablack-310-at-space-tech-expo-2026/" },
+  { d: "2026-01-28", kind: "Distribution", co: "ellsworth", t: "Ellsworth to distribute Vantablack coatings worldwide", s: "Surrey NanoSystems chose Ellsworth as lead partner for Vantablack 310 and other ultra-black coatings.", src: "Ellsworth", u: "https://www.ellsworth.com/resources/news/2026/vantablack-ultra-black-coatings-now-available-globally-through-ellsworth-adhesives/" },
+  { d: "2026-11-03", approx: 1, kind: "Sector", co: "", t: "Vynova shuts down vinyls production in Belgium", s: "The company is seeking a buyer under judicial restructuring. Same briefing: the US reinstated a grant for Eastman's PET recycling plant.", src: "C&EN", u: "https://cen.acs.org/business/business-watch-us-grant-eastman-pet-recycling-evonik-rejects-basf/104/web/2026/11" },
+  { d: "2026-11-03", approx: 1, kind: "Sector", co: "", t: "Chemical industry: more orders, but a downturn in sentiment", s: "Orders, utilisation and production rose while the business climate worsened.", src: "polyformnext", u: "https://www.polyformnext.de/news-en/chemical-industry--more-orders--but-a-downturn-in-sentiment.htm" },
+  { d: "2026-11-03", approx: 1, kind: "Sector", co: "", t: "Lessons from Britain's chemical industry", s: "What is lost when a plant closes: a supplier, a share of site costs, and local skills.", src: "The Conversation", u: "https://theconversation.com/from-industrial-powerhouse-to-uncertain-future-lessons-from-britains-chemical-industry-291818" },
+  { d: "2026-11-01", approx: 1, kind: "Results", co: "evonik", t: "Evonik more optimistic after strong third quarter", s: "Official Q3 release, published in November.", src: "Evonik", u: "https://www.evonik.com/en/news/press-releases/2026/11/Q3-2026.html" },
+  { d: "2026-10-31", approx: 1, kind: "Deal", co: "evonik", t: "Evonik again rebuffs BASF takeover bid, but leaves door open to talks", s: "Evonik is not ready to negotiate despite BASF's continued push.", src: "Plastics News", u: "https://www.plasticsnews.com/mergers-acquisitions/pn-basf-evonik-takeover/" },
+  { d: "2026-10-30", kind: "Deal", co: "basf", t: "Evonik likely to reject BASF's sweetened $12.5 billion bid", s: "FT report. Evonik has also been eyeing a $3.3 billion purchase of Ashland, which BASF considers too risky.", src: "Reuters", u: "https://www.reuters.com/business/evonik-likely-reject-basfs-sweetened-125-billion-bid-ft-reports-2026-10-30/" },
+  { d: "2026-10-29", kind: "Results", co: "henkel", t: "Henkel posts 6.5% organic growth and updates 2026 outlook", s: "Adhesive Technologies grew 7.9% organically, with price contributing 7.2%. Consumer Brands grew 4.8%.", src: "Henkel", u: "https://www.placera.se/pressmeddelanden/henkel-co-henkel-ag-co-kgaa-henkel-achieves-very-strong-organic-sales-growth-in-the-third-quarter-and-updates-outlook-for-2026-20261029" },
+  { d: "2026-10-29", kind: "Results", co: "wacker", t: "Wacker lifts Q3 earnings sharply year on year", s: "EBITDA €217.2M against €111.7M. FY EBITDA guide €625–750M, upper half expected. Net debt guide cut to about €200M.", src: "Wacker via pressetext", u: "https://www.pressetext.com/news/20261029005" },
+  { d: "2026-10-28", kind: "Sector", co: "", t: "Deloitte publishes its 2027 Chemical Industry Outlook", s: "Five shifts, from disruption to optionality through to a next-generation operating model.", src: "Deloitte", u: "https://www.deloitte.com/us/en/insights/industry/chemicals-and-specialty-materials/chemical-industry-outlook.html" },
+  { d: "2026-10-28", kind: "Results", co: "basf", t: "BASF reports considerable growth in EBITDA before special items", s: "Company headline credits strength across all core businesses.", src: "BASF", u: "https://www.basf.com/global/en/media/news-releases/2026/10/p-26-180" },
+  { d: "2026-10-22", kind: "Results", co: "dow", t: "Dow reports third quarter 2026 results", s: "Operating EPS $0.71 on $11.3B revenue. About $450M of transformation benefits delivered year to date.", src: "Dow via PR Newswire", u: "https://www.prnewswire.com/news-releases/dow-reports-third-quarter-2026-results-302916752.html" },
+  { d: "2026-10-07", approx: 1, kind: "Company", co: "momentive", t: "Momentive starts silane production in India", s: "Aimed at one of the fastest-growing tyre manufacturing markets.", src: "Rubber News", u: "https://www.rubbernews.com/suppliers/rn-momentive-silane-nxt-p97-india-tire-sustainable/" },
+  { d: "2026-10-01", kind: "Deal", co: "henkel", t: "Henkel closes acquisition of specialty coatings company Stahl", s: "Stahl joins Adhesive Technologies after regulatory approvals.", src: "Henkel", u: "https://www.henkel-northamerica.com/press/press-releases-and-kits/2026-01-10-henkel-successfully-closes-acquisition-of-specialty-coatings-company-stahl-2256796" },
+  { d: "2026-09-15", approx: 1, kind: "Company", co: "evonik", t: "Evonik concentrates business in Germany", s: "Official release, September 2026.", src: "Evonik", u: "https://www.evonik.com/en/news/press-releases/2026/09/evonik-concentrates-business-in-germany-.html" },
+  { d: "2026-08-12", kind: "Company", co: "dow", t: "Dow declares quarterly dividend of 35 cents per share", s: "", src: "Dow", u: "https://corporate.dow.com/en-us/news/press-releases/dow-declares-quarterly-dividend-of-35-cents-per-share3.html" },
+  { d: "2026-06-01", kind: "Company", co: "momentive", t: "Momentive appoints Jim Knaub as Chief Marketing Officer", s: "Follows Bob Waitt's appointment as Chief Commercial Officer on 27 April.", src: "Momentive", u: "https://www.momentive.com/en-us/news-press-releases/momentive-appoints-chief-marketing-officer" },
+  { d: "2026-01-26", kind: "Company", co: "momentive", t: "Momentive plans Niskayuna HQ redevelopment", s: "Renovates two wings and adds 14,500 square feet at the headquarters and research centre.", src: "Albany Business Review", u: "https://www.bizjournals.com/albany/news/2026/01/26/momentive-expansion-niskayuna.html" }
+];
+
+const TRENDS = [
+  { h: "Europe keeps losing capacity", p: "Closures have risen six-fold since 2022, removing about 9% of European capacity. New investment has fallen far behind.", e: "3,700 ktpa closed, 20,000 direct jobs lost, and announced investment down from 2,700 ktpa in 2022 to 300 ktpa in 2025.", src: "Cefic / Roland Berger, Jan 2026", u: "https://www.european-rubber-journal.com/article/2098741/european-chemical-plant-closures-accelerate-sharply" },
+  { h: "Consolidation is back", p: "BASF's pursuit of Evonik and the Huntsman–Olin merger lead the deal news. Henkel has pushed into specialty coatings by buying Stahl.", e: "BASF bid $12.5B. Evonik reportedly eyeing Ashland at $3.3B. Huntsman–Olin expected to close in Q1 2027. Stahl closed 1 October.", src: "Reuters, Oct 2026", u: "https://www.reuters.com/business/evonik-likely-reject-basfs-sweetened-125-billion-bid-ft-reports-2026-10-30/" },
+  { h: "Price is driving Q3 growth", p: "In this quarter's results, pricing did more than volume. This reading is drawn from the company figures shown here.", e: "Henkel: price +5.4%, volume +1.1%. Dow cited a 16% local price rise in one segment.", src: "Henkel, 29 Oct 2026", u: "https://www.placera.se/pressmeddelanden/henkel-co-henkel-ag-co-kgaa-henkel-achieves-very-strong-organic-sales-growth-in-the-third-quarter-and-updates-outlook-for-2026-20261029" },
+  { h: "From survival to reinvention", p: "Deloitte expects no broad recovery going into 2027, with structural overcapacity and uneven demand. Its advice is to redesign value chains and reinvest in advantaged assets.", e: "Five shifts: optionality, reinvestment, value over volume, partnership, new operating model.", src: "Deloitte, 28 Oct 2026", u: "https://www.deloitte.com/us/en/insights/industry/chemicals-and-specialty-materials/chemical-industry-outlook.html" },
+  { h: "Activity is up, confidence is down", p: "Recent sector sentiment shows more orders and higher utilisation, yet a weaker business climate.", e: "Headline summary only. Open the source for the survey figures.", src: "polyformnext, Nov 2026", u: "https://www.polyformnext.de/news-en/chemical-industry--more-orders--but-a-downturn-in-sentiment.htm" },
+  { h: "Domestic and circular supply", p: "Public and private money continues to back local biomanufacturing and recycling.", e: "US grant reinstated for Eastman's PET recycling plant. Biosphere raised $21M for biomanufacturing.", src: "C&EN, Nov 2026", u: "https://cen.acs.org/business/business-watch-us-grant-eastman-pet-recycling-evonik-rejects-basf/104/web/2026/11" }
+];
+
+const PRESS = [
+  ["Trade press", [["C&EN", "https://cen.acs.org/", "Global chemistry business"], ["ICIS", "https://www.icis.com/", "Prices and markets"], ["Chemistry World", "https://www.chemistryworld.com/", "RSC news"], ["CHEManager", "https://www.chemanager-online.com/en", "European industry"], ["Adhesives Mag", "https://www.adhesivesmag.com/", "Adhesives, sealants"], ["Plastics News", "https://www.plasticsnews.com/", "Polymers, deals"], ["European Rubber Journal", "https://www.european-rubber-journal.com/", "Rubber, silicones"], ["Rubber News", "https://www.rubbernews.com/", "Tyres, elastomers"]]],
+  ["Industry bodies", [["Cefic", "https://cefic.org/", "Europe"], ["American Chemistry Council", "https://www.americanchemistry.com/", "United States"], ["VCI", "https://www.vci.de/", "Germany"]]],
+  ["Outlooks", [["Deloitte 2027 outlook", "https://www.deloitte.com/us/en/insights/industry/chemicals-and-specialty-materials/chemical-industry-outlook.html", "Oct 2026"], ["Roland Berger: structural reset", "https://www.rolandberger.com/en/Insights/Publications/Europe-s-chemical-industry-structural-reset.html", "Europe"], ["Oliver Wyman outlook", "https://oliverwyman.com/our-expertise/insights/2025/dec/chemical-industry-outlook-2026-and-beyond.html", "Dec 2025"]]]
+];
+
+const LIVE_DEFAULT = { latest: "chemical industry news", trends: "chemical industry trends outlook" };
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = n => { const x = new Date(n.d + "T12:00:00Z"); const m = x.toLocaleString("en-GB", { month: "short", timeZone: "UTC" }); return (n.approx ? (n.co === "momentive" || n.d.endsWith("-15") || n.d === "2026-11-01" ? m + " " + x.getUTCFullYear() : "≈ " + x.getUTCDate() + " " + m) : x.getUTCDate() + " " + m + (x.getUTCFullYear() === 2026 ? "" : " " + x.getUTCFullYear())); };
+const sorted = [...NEWS].sort((a, b) => b.d.localeCompare(a.d));
+const ext = 'target="_blank" rel="noopener noreferrer"';
+
+function feedHTML(items) {
+  return '<ul class="feed">' + items.map(n => `<li><time datetime="${n.d}">${fmt(n)}</time><div><span class="tag">${esc(n.kind)}</span><a class="t" href="${esc(n.u)}" ${ext}>${esc(n.t)}</a><span class="src">${esc(n.src)}</span>${n.s ? `<p>${esc(n.s)}</p>` : ""}</div></li>`).join("") + "</ul>";
+}
+
+function newsUrl(q, when) {
+  return "https://news.google.com/search?q=" + encodeURIComponent(q + " when:" + when) + "&hl=en-US&gl=US&ceid=US:en";
+}
+function liveHTML(q) {
+  return `<section class="live" aria-label="Search the news"><h3>Search the news</h3><p>Opens your search in Google News in a new tab.</p>
+  <form id="live-form"><input id="live-q" aria-label="Company or topic" value="${esc(q)}">
+  <select id="live-tbs" aria-label="Period"><option value="7d">Past week</option><option value="30d" selected>Past month</option><option value="1y">Past year</option></select>
+  <a class="btn primary" id="live-go" href="${esc(newsUrl(q, "30d"))}" target="_blank" rel="noopener noreferrer">Search</a></form></section>`;
+}
+
+let filter = "All";
+let current = "latest";
+function render(view) {
+  current = view;
+  const co = COMPANIES.find(c => c.id === view);
+  let html = "";
+  if (co) {
+    const saved = (latest && latest.sections && latest.sections[co.id]) || [];
+    const rest = sorted.filter(n => n.co === co.id && !saved.some(x => x.url === n.u));
+    html = `<div class="head"><div class="hd">${logo(co, true)}<h2>${esc(co.name)}</h2></div><p>${esc(co.lede)}</p><div class="links">${co.links.map(l => `<a class="btn" href="${esc(l[1])}" ${ext}>${esc(l[0])}</a>`).join("")}${co.custom ? '<input id="rm-pw" type="password" aria-label="Admin password" placeholder="Admin password"><button class="btn" id="rm-co" type="button">Remove from menu</button><span class="note" id="rm-msg"></span>' : ""}</div></div>`;
+    if (co.stats.length) html += `<div class="stats">${co.stats.map(s => `<div class="stat"><b>${esc(s[0])}</b><span>${esc(s[1])}</span></div>`).join("")}</div>`;
+    html += `${rest.length ? `<section class="sec"><h3>${saved.length ? "Earlier updates" : "Recent updates"}</h3>${feedHTML(rest)}</section>` : saved.length ? "" : `<p class="note">${co.custom ? "No news found yet. Press Refresh, or use the search below." : "No dated 2026 news found in this check. Use the links above or search below."}</p>`}` + liveHTML(co.q);
+  } else if (view === "trends") {
+    html = `<div class="head"><h2>Major trends</h2><p>Six themes behind this quarter's news. Each one links to its source.</p></div>
+    <div class="trends">${TRENDS.map(t => `<article class="trend"><h3>${esc(t.h)}</h3><p>${esc(t.p)}</p><p class="ev">${esc(t.e)} <a href="${esc(t.u)}" ${ext}>${esc(t.src)}</a></p></article>`).join("")}</div>` + liveHTML(LIVE_DEFAULT.trends);
+  } else if (view === "press") {
+    html = `<div class="head"><h2>Trade press and outlooks</h2><p>Direct links to the publications and bodies that cover the sector.</p></div>` +
+      PRESS.map(g => `<section class="sec"><h3>${esc(g[0])}</h3><div class="dir">${g[1].map(l => `<a href="${esc(l[1])}" ${ext}>${esc(l[0])}<span>${esc(l[2])}</span></a>`).join("")}</div></section>`).join("");
+  } else {
+    const kinds = ["All", "Results", "Deal", "Distribution", "Sector", "Company"];
+    const items = filter === "All" ? sorted : sorted.filter(n => n.kind === filter);
+    html = `<div class="head"><h2>Latest updates</h2><p>Major stories across manufacturers, distributors and the wider sector. ≈ marks an approximate date.</p></div>
+    <section class="sec"><h3>Briefing archive</h3><div class="chips" role="group" aria-label="Filter by type">${kinds.map(k => `<button class="chip" data-k="${k}" aria-pressed="${k === filter}">${k === "Deal" ? "Deals" : k === "Company" ? "Company news" : k === "Distribution" ? "Distributors" : k}</button>`).join("")}</div></section>${feedHTML(items)}` + liveHTML(LIVE_DEFAULT.latest);
+  }
+  $("view").innerHTML = html;
+  document.querySelectorAll("[data-v]").forEach(b => b.dataset.v === view ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+  document.querySelectorAll(".cat").forEach(w => w.classList.toggle("on", !!w.querySelector('[aria-current="page"]')));
+  const rm = $("rm-co");
+  if (rm) rm.onclick = () => removeCompany(co.id);
+  document.querySelectorAll(".chip").forEach(c => c.onclick = () => { filter = c.dataset.k; render("latest"); });
+  const f = $("live-form");
+  if (f) {
+    const link = () => { $("live-go").href = newsUrl($("live-q").value.trim() || "chemical industry", $("live-tbs").value); };
+    f.oninput = link; f.onchange = link; f.onsubmit = e => { e.preventDefault(); $("live-go").click(); };
+  }
+  showFresh(view);
+}
+
+function clean(s) {
+  return String(s || "").replace(/!?\[[^\]]*\]\([^)]*\)/g, " ").replace(/[|#*_`\\]+/g, " ").replace(/-{2,}/g, " ").replace(/\s+/g, " ").trim().slice(0, 220);
+}
+
+/* news.json is published with the page and updated by a scheduled task, so every visitor gets the same news. */
+let latest = null;
+function showFresh(v) {
+  const old = $("fresh"); if (old) old.remove();
+  const key = COMPANIES.some(c => c.id === v) ? v : v === "latest" ? "latest" : "";
+  const list = latest && latest.sections && latest.sections[key];
+  const safe = Array.isArray(list) ? list.filter(x => /^https?:\/\//.test(x.url || "")) : [];
+  if (!safe.length) return;
+  const s = document.createElement("section"); s.id = "fresh"; s.className = "sec";
+  const h = document.createElement("h3"); h.textContent = "Latest news"; s.append(h);
+  const ul = document.createElement("ul"); ul.className = "feed";
+  for (const x of safe) {
+    const row = document.createElement("li");
+    const d = document.createElement("span"); d.className = "d"; d.textContent = x.date || "";
+    const body = document.createElement("div");
+    const a = document.createElement("a"); a.className = "t"; a.href = x.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = clean(x.title) || x.url;
+    const src = document.createElement("span"); src.className = "src"; try { src.textContent = x.source || new URL(x.url).hostname.replace(/^www\./, ""); } catch (_) {}
+    body.append(a, src);
+    const t = clean(x.summary);
+    if (t) { const p = document.createElement("p"); p.textContent = t; body.append(p); }
+    row.append(d, body); ul.append(row);
+  }
+  s.append(ul);
+  ($("view").querySelector(".stats") || $("view").querySelector(".head")).after(s);
+}
+function renderTicker() {
+  const fresh = latest && latest.sections && latest.sections.latest;
+  const items = (Array.isArray(fresh) && fresh.length ? fresh : sorted.slice(0, 10).map(n => ({ title: n.t, url: n.u, date: fmt(n) })))
+    .filter(x => /^https?:\/\//.test(x.url || "")).slice(0, 12);
+  const t = $("ticker"); t.textContent = "";
+  for (const copy of [false, true]) for (const x of items) {
+    const a = document.createElement("a"); a.className = "titem"; a.href = x.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    if (copy) { a.setAttribute("aria-hidden", "true"); a.tabIndex = -1; }
+    const d = document.createElement("small"); d.textContent = x.date || "";
+    const h = document.createElement("span"); h.textContent = clean(x.title);
+    a.append(d, h); t.append(a);
+  }
+  t.style.setProperty("--tick-time", Math.max(60, items.length * 12) + "s");
+}
+/* Companies added here are saved on the site, so every visitor sees them. Adding or removing needs the admin password. */
+const CATS = { manufacturers: { label: "Manufacturers", fam: "spec" }, distributors: { label: "Distributors", fam: "dist" } };
+function toCompany(x) {
+  const url = /^https?:\/\//i.test(x.url || "") ? x.url : "";
+  return { id: x.id, sym: x.name.replace(/[^\p{L}\p{N}]/gu, "").slice(0, 2) || "?", name: x.name, tick: x.note || "Added", fam: CATS[x.cat].fam, dist: x.cat === "distributors" ? 1 : 0, custom: 1, q: x.name,
+    lede: "Added to " + CATS[x.cat].label + (x.note ? ": " + x.note + "." : "."), stats: [], links: url ? [["Website", url]] : [] };
+}
+function applyCompanies(list) {
+  for (let i = COMPANIES.length - 1; i >= 0; i--) if (COMPANIES[i].custom) COMPANIES.splice(i, 1);
+  (list || []).filter(x => x && CATS[x.cat] && /^my-[a-z0-9-]+$/.test(x.id || "")).forEach(x => COMPANIES.push(toCompany(x)));
+  const open = [...document.querySelectorAll(".cbody:not([hidden])")].map(b => b.closest(".cat").dataset.cat);
+  buildMenu();
+  document.querySelectorAll(".cat").forEach(w => { if (open.includes(w.dataset.cat)) setOpen(w, true); });
+}
+const group = f => COMPANIES.filter(f).map(c => ({ v: c.id, name: c.name, c, note: c.tick.split(": ").pop() }));
+const menuList = () => [
+  { key: "overview", label: "Overview", items: [{ v: "latest", name: "Latest updates" }, { v: "trends", name: "Major trends", note: TRENDS.length + " themes" }] },
+  { key: "manufacturers", label: "Manufacturers", add: 1, items: group(c => !c.dist) },
+  { key: "distributors", label: "Distributors", add: 1, items: group(c => c.dist).map(i => ({ ...i, note: i.c.custom ? i.note : "" })) },
+  { key: "sources", label: "Sources", items: [{ v: "press", name: "Trade press and outlooks" }] }
+];
+const closeMenus = () => document.querySelectorAll(".cat").forEach(w => setOpen(w, false));
+function setOpen(w, on) {
+  w.querySelector(".cbody").hidden = !on;
+  w.querySelector(".cbtn").setAttribute("aria-expanded", on);
+}
+function buildMenu() {
+  $("menus").innerHTML = menuList().map(m => `<section class="cat" data-cat="${m.key}"><button class="cbtn" type="button" aria-expanded="false" aria-controls="cat-${m.key}">${esc(m.label)}${m.add ? `<span>${m.items.filter(x => x.c).length}</span>` : ""}</button>
+  <div class="cbody" id="cat-${m.key}" hidden>${m.items.map(x => `<button class="mi" type="button" data-v="${x.v}">${x.c ? logo(x.c) : ""}<span class="mtxt">${esc(x.name)}${x.note ? `<small>${esc(x.note)}</small>` : ""}</span></button>`).join("")}
+  ${m.add ? `<button class="addbtn" type="button" data-add="${m.key}">+ Add company</button>
+  <form class="addform" id="form-${m.key}" data-cat="${m.key}" hidden novalidate>
+    <label for="name-${m.key}">Company name<input id="name-${m.key}" name="name" maxlength="60" autocomplete="off"></label>
+    <label for="url-${m.key}">Website (optional)<input id="url-${m.key}" name="url" maxlength="200" autocomplete="off" placeholder="www.example.com"></label>
+    <label for="note-${m.key}">Country or note (optional)<input id="note-${m.key}" name="note" maxlength="40" autocomplete="off"></label>
+    <label for="pw-${m.key}">Admin password<input id="pw-${m.key}" name="password" type="password" autocomplete="current-password"></label>
+    <p class="adderr" hidden></p>
+    <div class="addacts"><button class="btn primary" type="submit">Add</button><button class="btn" type="button" data-cancel="1">Cancel</button></div>
+    <p>Added for everyone who visits the site.</p>
+  </form>` : ""}</div></section>`).join("");
+}
+function go(v) {
+  try { localStorage.setItem("view", v); } catch (_) {}
+  if (location.hash === "#" + v) render(v); else location.hash = v;
+  closeMenus(); scrollTo(0, 0);
+}
+async function addCompany(form) {
+  const err = form.querySelector(".adderr"), go_ = form.querySelector("[type=submit]");
+  const fail = t => { err.textContent = t; err.hidden = false; };
+  const e = form.elements;
+  if (!e.name.value.trim()) return fail("Enter a company name.");
+  if (COMPANIES.some(c => c.name.toLowerCase() === e.name.value.trim().toLowerCase())) return fail(e.name.value.trim() + " is already in the menus.");
+  if (!e.password.value) return fail("Enter the admin password.");
+  go_.disabled = true; go_.textContent = "Adding…"; err.hidden = true;
+  try {
+    const r = await fetch("/api/companies", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: e.name.value, url: e.url.value, note: e.note.value, password: e.password.value, cat: form.dataset.cat }) });
+    const d = await r.json();
+    if (!r.ok) return fail(d.error || "The company could not be added. Try again.");
+    applyNews(d); go(d.id);
+  } catch (_) { fail("The site could not be reached. Try again."); }
+  finally { go_.disabled = false; go_.textContent = "Add"; }
+}
+async function removeCompany(id) {
+  const pw = $("rm-pw"), msg = $("rm-msg");
+  if (!pw.value) { msg.textContent = "Enter the admin password."; return; }
+  try {
+    const r = await fetch("/api/companies/" + id, { method: "DELETE", headers: { "x-admin-password": pw.value } });
+    const d = await r.json();
+    if (!r.ok) { msg.textContent = d.error || "The company could not be removed."; return; }
+    applyNews(d); go("latest");
+  } catch (_) { msg.textContent = "The site could not be reached. Try again."; }
+}
+function applyNews(d) {
+  const fresh = {};
+  for (const [k, v] of Object.entries(d.sections || {})) if (Array.isArray(v) && v.length) fresh[k] = v;
+  latest = { updated: d.updated || latest.updated, sections: { ...latest.sections, ...fresh } };
+  applyCompanies(d.companies);
+  if (d.updated) $("asof").textContent = "News updated " + new Date(d.updated).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  renderTicker();
+  const h = location.hash.slice(1);
+  if (views().includes(h)) current = h;
+  if (views().includes(current)) render(current);
+}
+async function loadNews(view) {
+  const b = $("refresh"); b.disabled = true; b.textContent = "Refreshing…";
+  try {
+    const r = await fetch(view ? "/api/refresh" : "/api/news", view ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ view }) } : undefined);
+    if (!r.ok) throw new Error(String(r.status));
+    applyNews(await r.json());
+  } catch (_) {
+    $("asof").textContent = "Could not reach the news service. Showing saved news.";
+  } finally { b.disabled = false; b.textContent = "Refresh"; }
+}
+$("menus").addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.classList.contains("cbtn")) { const w = t.closest(".cat"), open = t.getAttribute("aria-expanded") === "true"; closeMenus(); setOpen(w, !open); }
+  else if (t.dataset.v) go(t.dataset.v);
+  else if (t.dataset.add) { t.hidden = true; const f = $("form-" + t.dataset.add); f.hidden = false; f.elements.name.focus({ preventScroll: true }); f.scrollIntoView({ block: "nearest" }); }
+  else if (t.dataset.cancel) { const f = t.closest("form"); f.reset(); f.hidden = true; f.querySelector(".adderr").hidden = true; f.previousElementSibling.hidden = false; }
+});
+document.addEventListener("click", e => { if (!e.target.closest(".cat")) closeMenus(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
+$("menus").addEventListener("submit", e => { e.preventDefault(); addCompany(e.target); });
+buildMenu();
+
+const views = () => ["latest", "trends", "press", ...COMPANIES.map(c => c.id)];
+function route() { const h = location.hash.slice(1), V = views(); let v = V.includes(h) ? h : null; if (!v) { try { v = localStorage.getItem("view"); } catch (_) {} } if (!V.includes(v)) v = "latest"; render(v); }
+addEventListener("hashchange", route);
+$("refresh").onclick = () => loadNews(current);
+latest = {"updated": "2026-11-05T06:22:57Z", "sections": {"latest": [{"title": "Huntsman Q3 Earnings Call Highlights", "url": "https://www.tradingview.com/news/marketbeat:aac52811a094b:0-huntsman-q3-earnings-call-highlights/", "source": "MarketBeat via TradingView", "date": "≈ 4 Nov", "summary": "Executives said the company expects to improve 2026 EBITDA by more than $100 million from 2025 despite weak housing activity."}, {"title": "Chemicals' 2026 Rebound: Strong Returns, Narrow Demand", "url": "https://chemanager-online.com/en/news/chemicals-2026-rebound-strong-returns-narrow-demand", "source": "CHEManager", "date": "≈ 4 Nov", "summary": "McKinsey's latest Chemical Insights Quarterly shows chemicals shareholder returns rose 14% through mid-September 2026, against 10% for the broader world index."}, {"title": "From industrial powerhouse to uncertain future: lessons from Britain's chemical industry", "url": "https://www.lboro.ac.uk/news-events/news/2026/november/lessons-from-uk-chemical-industry/", "source": "Loughborough University", "date": "≈ 4 Nov", "summary": "An opinion piece by Professor Jan Godsell, Dean of Loughborough Business School, for The Conversation."}, {"title": "German chemical sector mood slips in October after two-month recovery", "url": "https://www.globalbankingandfinance.com/german-chemical-sector-mood-slips-october-two-month-recovery/", "source": "Reuters via Global Banking & Finance", "date": "3 Nov", "summary": "Germany's chemical industry business climate deteriorated in October, erasing two months of improvement, the Ifo Institute said."}, {"title": "Evonik's losses shrink as core earnings surge 40%", "url": "https://finance.yahoo.com/markets/stocks/articles/evoniks-losses-shrink-core-earnings-090329333.html", "source": "Yahoo Finance", "date": "≈ 3 Nov", "summary": "Evonik said on Tuesday that its net loss narrowed in the third quarter compared with the same period of the previous year."}, {"title": "China's chemical industry expansion squeezes foreign producers, intensifies global competition", "url": "https://www.aninews.in/news/world/asia/china8217s-chemical-industry-expansion-squeezes-foreign-producers-intensifies-global-competition20261103150243", "source": "ANI", "date": "3 Nov", "summary": "China's rapid expansion of its chemical manufacturing industry is putting increasing pressure on foreign producers."}, {"title": "Chemical Industry 2027: Shifting focus from survival to strategic reinvention, Deloitte", "url": "https://www.indianchemicalnews.com/chemical/chemical-industry-2027-shifting-focus-from-survival-to-strategic-reinvention-deloitte-32478", "source": "Indian Chemical News", "date": "≈ 2 Nov", "summary": "The global chemical industry is entering 2027 with little certainty of a broad-based recovery."}, {"title": "Evonik rejects BASF bid despite sweetened $12.5 billion terms", "url": "https://www.reuters.com/business/evonik-we-are-not-ready-negotiate-basfs-sweetened-bid-2026-10-30/", "source": "Reuters", "date": "30 Oct", "summary": "Evonik said BASF's sweetened offer, worth €11.18 billion or €24 per share, was not enough to start formal deal talks, but asked BASF's management to elaborate on the rationale."}, {"title": "Henkel lifts 2026 sales outlook after pricing drives Q3 beat", "url": "https://www.reuters.com/business/henkel-lifts-2026-sales-outlook-after-pricing-drives-q3-beat-2026-10-29/", "source": "Reuters", "date": "29 Oct", "summary": "Henkel slightly upgraded its 2026 sales outlook after stronger-than-expected pricing helped organic sales beat forecasts."}, {"title": "Germany's Wacker Chemie's Q3 core profit nearly doubles on cost cuts; keeps outlook", "url": "https://www.reuters.com/business/germanys-wacker-chemies-q3-core-profit-nearly-doubles-cost-cuts-keeps-outlook-2026-10-29/", "source": "Reuters", "date": "29 Oct", "summary": "Wacker posted higher third-quarter core profit, helped by cost cuts, higher selling prices and a one-off gain in polysilicon, while maintaining its full-year sales and earnings forecast."}], "dow": [{"title": "Dow Launches DOWSIL IE-5619 Emulsion for Textile Industry", "url": "https://finance.yahoo.com/markets/stocks/articles/dow-launches-dowsil-ie-5619-135300972.html", "source": "Yahoo Finance", "date": "≈ 30 Oct", "summary": "The emulsion offers durable water and oil repellency without fluorinated chemistry."}, {"title": "Dow forecasts profit above estimates on pricing gains and cost cuts", "url": "https://www.reuters.com/business/chemicals-maker-dow-beats-third-quarter-profit-estimates-2026-10-22/", "source": "Reuters", "date": "22 Oct", "summary": "Dow forecast fourth-quarter adjusted core profit above market expectations, betting on higher polyethylene prices and its cost-cutting measures."}, {"title": "Dow Chemical Co.'s Lake Jackson R&D campus trades hands", "url": "https://www.bizjournals.com/houston/news/2026/10/19/brixton-dow-texas-innovation-center-exchangeright.html", "source": "Houston Business Journal", "date": "19 Oct", "summary": "Brixton Capital sold the Dow Texas Innovation Center to ExchangeRight Essential Income REIT after owning it since 2020."}, {"title": "Dow racial discrimination lawsuits grow, attorney feels they had impact on CEO pick", "url": "https://www.abc12.com/news/local/dow-racial-discrimination-lawsuits-grow-attorney-feels-they-had-impact-on-ceo-pick/article_80b928a5-3a00-4e31-af1f-239bf2331a1d.html", "source": "ABC12", "date": "≈ 8 Oct", "summary": "The number of lawsuits filed against the company by this law firm has grown to 20."}], "henkel": [{"title": "Henkel opens new application centre in Indonesia", "url": "https://www.worldfootwear.com/news/henkel-opens-new-application-centre-in-indonesia/11879.html", "source": "World Footwear", "date": "≈ 5 Nov", "summary": "The centre in Central Java will support footwear and fashion manufacturers with adhesive technologies and product development."}, {"title": "Right-Sized Paper Mailers: Heat-seal coating enables tailored paper envelopes", "url": "https://www.henkel.com/press-and-media/press-releases-and-kits/2026-11-03-right-sized-paper-mailers-heat-seal-coating-enables-tailored-paper-envelopes-2273216", "source": "Henkel", "date": "3 Nov", "summary": "Aquence HS 2819 RE from Henkel optimizes paper-based e-commerce packaging."}, {"title": "Henkel India strengthens inclusive skill development through Navkshitij partnership", "url": "https://packagingsouthasia.com/invest-ma-jv/henkel-navkshitij/", "source": "Packaging South Asia", "date": "≈ 2 Nov", "summary": ""}, {"title": "Henkel lifts 2026 sales outlook after pricing drives Q3 beat", "url": "https://www.reuters.com/business/henkel-lifts-2026-sales-outlook-after-pricing-drives-q3-beat-2026-10-29/", "source": "Reuters", "date": "29 Oct", "summary": "Henkel slightly upgraded its 2026 sales outlook after stronger-than-expected pricing helped organic sales beat forecasts."}], "wacker": [{"title": "Germany's Wacker Chemie's Q3 core profit nearly doubles on cost cuts; keeps outlook", "url": "https://www.reuters.com/business/germanys-wacker-chemies-q3-core-profit-nearly-doubles-cost-cuts-keeps-outlook-2026-10-29/", "source": "Reuters", "date": "29 Oct", "summary": "Wacker posted higher third-quarter core profit, helped by cost cuts, higher selling prices and a one-off gain in polysilicon, while maintaining its full-year sales and earnings forecast."}, {"title": "Wacker Chemie lifts 2026 EBITDA outlook to upper half of range", "url": "https://finance.yahoo.com/markets/stocks/articles/wacker-chemie-lifts-2026-ebitda-071811522.html", "source": "Investing.com via Yahoo Finance", "date": "≈ 29 Oct", "summary": "Wacker Chemie reported third-quarter results that exceeded expectations."}], "momentive": [{"title": "Momentive starts silane production in India", "url": "https://www.rubbernews.com/suppliers/rn-momentive-silane-nxt-p97-india-tire-sustainable/", "source": "Rubber News", "date": "≈ 7 Oct", "summary": "Aimed at one of the fastest-growing tyre manufacturing markets."}, {"title": "Momentive appoints Jim Knaub as Chief Marketing Officer", "url": "https://www.momentive.com/en-us/news-press-releases/momentive-appoints-chief-marketing-officer", "source": "Momentive", "date": "1 Jun", "summary": "Follows Bob Waitt's appointment as Chief Commercial Officer on 27 April."}, {"title": "Momentive plans Niskayuna HQ redevelopment", "url": "https://www.bizjournals.com/albany/news/2026/01/26/momentive-expansion-niskayuna.html", "source": "Albany Business Review", "date": "26 Jan", "summary": "Renovates two wings and adds 14,500 square feet at the headquarters and research centre."}], "basf": [{"title": "Evonik rejects BASF bid despite sweetened $12.5 billion terms", "url": "https://www.reuters.com/business/evonik-we-are-not-ready-negotiate-basfs-sweetened-bid-2026-10-30/", "source": "Reuters", "date": "30 Oct", "summary": "Evonik said BASF's sweetened offer, worth €11.18 billion or €24 per share, was not enough to start formal deal talks, but asked BASF's management to elaborate on the rationale."}, {"title": "Evonik likely to reject BASF's sweetened $12.5 billion bid, FT reports", "url": "https://www.reuters.com/business/evonik-likely-reject-basfs-sweetened-125-billion-bid-ft-reports-2026-10-30/", "source": "Reuters", "date": "30 Oct", "summary": "Evonik was expected to reject the sweetened €11.18 billion takeover offer from BASF, deeming it too low."}, {"title": "BASF leader Denise Hartmann inducted into the Women in Manufacturing Hall of Fame", "url": "https://www.basf.com/us/en/media/news-releases/2026/10/P-US-26-40", "source": "BASF", "date": "≈ 31 Oct", "summary": "Denise Hartmann is Senior Vice President, Dispersions and Resins Americas."}], "evonik": [{"title": "Evonik's losses shrink as core earnings surge 40%", "url": "https://finance.yahoo.com/markets/stocks/articles/evoniks-losses-shrink-core-earnings-090329333.html", "source": "Yahoo Finance", "date": "≈ 3 Nov", "summary": "Evonik said on Tuesday that its net loss narrowed in the third quarter compared with the same period of the previous year."}, {"title": "Evonik Leaves Opening After Turning Down BASF Takeover Talks", "url": "https://www.bloomberg.com/news/articles/2026-10-30/evonik-turns-down-offer-to-enter-takeover-talks-with-suitor-basf", "source": "Bloomberg", "date": "30 Oct", "summary": "Evonik will not enter negotiations with BASF but is willing to hear its rival's pitch for a combination."}, {"title": "Evonik rejects BASF bid despite sweetened $12.5 billion terms", "url": "https://www.reuters.com/business/evonik-we-are-not-ready-negotiate-basfs-sweetened-bid-2026-10-30/", "source": "Reuters", "date": "30 Oct", "summary": "Evonik said BASF's sweetened offer, worth €11.18 billion or €24 per share, was not enough to start formal deal talks, but asked BASF's management to elaborate on the rationale."}], "shinetsu": [{"title": "Shin-Etsu Chemical Begins Raising Silicon Wafer Prices, but Long-Term Contracts May Not Follow Until Late 2027", "url": "https://xenospectrum.com/en/shinetsu-wafer-price-outside-contract/", "source": "XenoSpectrum", "date": "≈ 3 Nov", "summary": "On its earnings call on October 27, 2026, Shin-Etsu disclosed that price increases for semiconductor silicon wafers have begun for some customers."}, {"title": "Shin-Etsu Chemical Posts Record Q2 Operating Profit of ¥212.1 Billion, Up 27% on AI Demand", "url": "https://finance.biggo.com/news/JP_4063.T_2026-10-27", "source": "BigGo Finance", "date": "27 Oct", "summary": "Revenue for April to September 2026 was ¥1.4206 trillion, up 10.6% year on year."}], "otto": [{"title": "OTTO-CHEMIE reports a positive Fensterbau Frontale 2026", "url": "https://www.otto-chemie.de/cdn/uploads/otto-auf-der-frontale-2026-nachberichterstattung.pdf", "source": "OTTO-CHEMIE", "date": "≈ 15 Apr", "summary": "Expert discussions rose about 18%. It sees growing demand for tested system solutions and easier processing."}, {"title": "OTTO-CHEMIE starts a second filling line in Fridolfing", "url": "https://www.otto-chemie.de/cdn/uploads/zweite-abfuelllinie-bau-1.pdf", "source": "OTTO-CHEMIE", "date": "≈ 15 Feb 2025", "summary": "Adds capacity for sanitary silicones and an automated inline colouring process."}], "huntsman": [{"title": "Huntsman Q3 Earnings Call Highlights", "url": "https://www.tradingview.com/news/marketbeat:aac52811a094b:0-huntsman-q3-earnings-call-highlights/", "source": "MarketBeat via TradingView", "date": "≈ 4 Nov", "summary": "Executives said the company expects to improve 2026 EBITDA by more than $100 million from 2025 despite weak housing activity."}, {"title": "Huntsman Q3 2026 Results: Net Loss Narrows, Adjusted EBITDA Up, Olin Merger on Track", "url": "https://www.indexbox.io/blog/huntsman-q3-2026-net-loss-narrows-to-18-million-as-adjusted-ebitda-rises-to-132-million/", "source": "IndexBox", "date": "≈ 3 Nov", "summary": "Huntsman reported a third quarter 2026 net loss attributable to the company of $18 million, narrower than the $25 million net loss a year earlier."}], "molykote": [{"title": "DuPont shows Molykote lubricants at CSEAC 2026", "url": "https://www.dupont.com/news/dupont-highlights-vespel-high-performance-materials-at-CSEAC-2026-to-enable-next-generation-semiconductor-manufacturing.html", "source": "DuPont", "date": "31 Aug", "summary": "PFPE-based lubricants shown with Vespel materials for semiconductor manufacturing."}, {"title": "DuPont breaks ground on Molykote plant in China", "url": "https://www.dupont.com/news/dupont-breaks-ground-on-molykote-lubricants-manufacturing-plant-in-china.html", "source": "DuPont", "date": "18 Nov 2025", "summary": "Located in Zhangjiagang, Jiangsu Province, and expected to be operational by early 2027."}], "biesterfeld": [{"title": "Biesterfeld expands Eastman distribution to Southern Africa", "url": "https://www.european-coatings.com/news/markets-companies/biesterfeld-expands-eastman-distribution-to-southern-africa/", "source": "European Coatings", "date": "5 Oct", "summary": "Coatings and inks portfolio, sold through its local company Aerontec in eight countries."}, {"title": "Biesterfeld and Traceless Materials form strategic partnership", "url": "https://chemanager-online.com/en/news/biesterfeld-and-traceless-materials-form-strategic-partnership", "source": "CHEManager", "date": "6 May", "summary": "Aims to bring plastic-free injection moulding materials to market at scale."}], "bodomoller": [{"title": "Bodo Möller Chemie names Abdallah Dabaghi Managing Director", "url": "https://bm-chemie.com/news/appointment-of-maniging-director-egypt-nigeria-and-the-middle-east/", "source": "Bodo Möller Chemie", "date": "22 Sept", "summary": "Covers Egypt, Nigeria and the Middle East."}, {"title": "Bodo Möller Chemie opens aerospace warehouse in India", "url": "https://bm-chemie.com/news/inaugauration-warehouse-india-aerospace/", "source": "Bodo Möller Chemie", "date": "7 Jul", "summary": "AS 9120-certified site for aerospace and specialty chemicals."}, {"title": "Bodo Möller Chemie signs worldwide supply contract with Airbus", "url": "https://bm-chemie.com/news/supply-contract-airbus/", "source": "Bodo Möller Chemie", "date": "2 Mar", "summary": "Strengthens its aerospace business."}, {"title": "Bodo Möller Chemie and Henkel expand automotive sales cooperation", "url": "https://www.european-coatings.com/news/bodo-moller-chemie-and-henkel-expand-sales-cooperation-in-the-automotive-sector/", "source": "European Coatings", "date": "16 Feb", "summary": "Builds on their partnership in Central and Eastern Europe."}], "ellsworth": [{"title": "Ellsworth Adhesives to highlight Vantablack 310 at Space Tech Expo", "url": "https://www.ellsworth.com/resources/news/2026/ellsworth-adhesives-to-highlight-vantablack-310-at-space-tech-expo-2026/", "source": "Ellsworth", "date": "21 Apr", "summary": "Aerospace materials from partners including Dow, Dymax and Henkel, shown in Anaheim on 3–4 June."}, {"title": "Ellsworth to distribute Vantablack coatings worldwide", "url": "https://www.ellsworth.com/resources/news/2026/vantablack-ultra-black-coatings-now-available-globally-through-ellsworth-adhesives/", "source": "Ellsworth", "date": "28 Jan", "summary": "Surrey NanoSystems chose Ellsworth as lead partner for Vantablack 310 and other ultra-black coatings."}], "krayden": []}};
+route();
+renderTicker();
+loadNews();
+</script>
+
+</body></html>

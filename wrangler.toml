@@ -1,0 +1,12 @@
+name = "chemical-sector-monitor"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "chemical-monitor"
+database_id = "dbd65ad2-ceb9-4f36-a37a-647be4d37e38"
+
+# News updates every 4 hours, even when nobody visits.
+[triggers]
+crons = ["0 */4 * * *"]
